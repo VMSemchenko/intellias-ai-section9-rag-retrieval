@@ -1,0 +1,26 @@
+
+question: which services still use the deprecated v3 auth flow, and who owns them?
+mode:     query
+
+filters:    {'service': 'auth-svc', 'version': 'v3', 'semantic_query': 'which services still use the deprecated v3 auth flow, and who owns them'}
+expansion:  which components are still employing the outdated v3 authentication process, and who is responsible for them
+expansion:  which systems are still utilizing the obsolete v3 authorization mechanism, and who maintains them
+considered: 6 chunks
+note:       6 ranked lists, union + dedupe by best distance — rank fusion arrives in section 05
+
+retrieved:
+  1. [api-auth-v3#0] d=0.433 superseded API reference: auth-svc v3 session endpoints
+       # API reference: auth-svc v3 session endpoints  **Superseded.** Use the v4 token endpoints. These endpoints return `Deprecation: true` and `Sunset: Wed, 31 Dec 2026 23:59:59 GMT` on every response.  Base path `/v3`.  ## 
+  2. [policy-deprecation#0] d=0.448 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+  3. [adr-0031#0] d=0.476 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  4. [adr-0031#1] d=0.504 superseded ADR-0031: Session cookie authentication (v3)
+       The cookie is opaque, so revocation is immediate: delete the Redis key and the next introspect call fails. That was the deciding factor over signed tokens.  The cost is a network hop. Every request that needs identity ma
+  5. [adr-0042#2] d=0.519 active     ADR-0042: Token exchange authentication (v4)
+       The token exchange itself is a new outbound call that clients did not previously make. Services that call `auth-svc` on behalf of a user — rather than passing a token through — now make one extra outbound HTTPS request p
+
+I don't have that in the docs. To find this information, you would need:
+- The list of services that still call `POST /v3/session/introspect`.
+
+[4.2s]

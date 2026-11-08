@@ -1,0 +1,27 @@
+
+question: why is it 502ing?
+mode:     result
+
+filters:    {'semantic_query': 'why is it 502ing?'}
+expansion:  What causes the 502 Bad Gateway error?
+expansion:  Why is the 502 error occurring in our system?
+considered: 23 chunks
+note:       fetched 23 unique chunks, reranked to 10, diversified to 5, reordered for attention
+
+retrieved:
+  1. [pm-2026-07-checkout-latency#1] d=0.587 rerank=8 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       # Postmortem 2026-07-01: checkout p99 latency and 502s after the v4 auth migration  **Duration:** 47 minutes of degraded checkout, 11 minutes of hard failure. **Impact:** ~4,100 order submissions failed with a gateway er
+  2. [pm-2026-02-gateway-tls#1] d=0.602 rerank=2 active     Postmortem 2026-02-20: total outage from an expired TLS ce
+       # Postmortem 2026-02-20: total outage from an expired TLS certificate  **Duration:** 22 minutes of total unavailability. **Impact:** All external traffic failed TLS handshake. No requests reached any service.  ## Timelin
+  3. [rb-gateway-timeouts#3] d=0.629 rerank=0 active     Runbook: gateway 5xx and timeout triage
+       Group by route. One route means a service problem. All routes at once means the gateway, TLS, or something shared — check certificate expiry, the shared middleware version, and the global rate limiter before assuming a s
+  4. [rb-gateway-timeouts#1] d=0.490 rerank=2 active     Runbook: gateway 5xx and timeout triage
+       # Runbook: gateway 5xx and timeout triage  **Page trigger:** `gateway_5xx_ratio > 0.01` over 5 minutes on any route.  This runbook decides *which team owns the incident*. It rarely ends with a gateway change.  ## Step 1:
+  5. [adr-0019#1] d=0.465 rerank=3 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       # ADR-0019: Edge routing, deadlines and upstream error mapping  **Status:** Active.  ## Context  Every external request enters through one gateway. It needs a single, predictable policy for how long a request may take an
+
+Thumbnails stop appearing when the resize queue backs up, not when uploads fail [rb-media-thumbnails#0]. The worker pool is capped at four by design, because each resize holds a full image in memory [adr-0090#2]. A single oversized upload can stall a worker for minutes while the queue keeps growing [pm-2026-08-media-backlog#1]. Check queue depth and the oldest pending job age first [rb-media-thumbnails#1].
+
+This issue is related to the media service, not the checkout service mentioned in the provided context. To find information about a service or incident not mentioned in the context, you would need the service name, version, and document type. In this case, the service is media, the document type is likely a postmortem or runbook, and the version is not specified.
+
+[31.6s]

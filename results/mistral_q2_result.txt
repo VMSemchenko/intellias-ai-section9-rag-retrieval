@@ -1,0 +1,25 @@
+
+question: which services still use the deprecated v3 auth flow, and who owns them?
+mode:     result
+
+filters:    {'version': 'v3', 'semantic_query': 'which services still use the deprecated auth flow, and who owns them?'}
+expansion:  Which services continue to employ the outdated authentication method, and who is their responsible party?
+expansion:  Which services persist with the legacy authentication approach, and who manages them?
+considered: 35 chunks
+note:       fetched 35 unique chunks, reranked to 10, diversified to 5, reordered for attention
+
+retrieved:
+  1. [policy-deprecation#1] d=0.526 rerank=9 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+  2. [rb-notify-dlq#2] d=0.658 rerank=0 active     Runbook: draining the notify-svc dead-letter queue
+       1. Verify the destination is actually healthy now. Replaying into a still-broken endpoint    burns the retry budget again and refills the queue.  notify-cli probe --subscription <id>  2. Replay in bounded batches. The pe
+  3. [policy-deprecation#0] d=0.503 rerank=0 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+  4. [api-notify-webhooks#1] d=0.711 rerank=0 active     API reference: notify-svc webhook subscriptions and delive
+       # API reference: notify-svc webhook subscriptions and delivery headers  ## POST /v3/subscriptions  { "url": "https://partner.example.com/hooks",       "events": ["order.submitted", "order.captured"],       "secret": "whs
+  5. [api-auth-v3#1] d=0.655 rerank=0 superseded API reference: auth-svc v3 session endpoints
+       # API reference: auth-svc v3 session endpoints  **Superseded.** Use the v4 token endpoints. These endpoints return `Deprecation: true` and `Sunset: Wed, 31 Dec 2026 23:59:59 GMT` on every response.  Base path `/v3`.  ## 
+
+Thumbnails stop appearing when the resize queue backs up, not when uploads fail [rb-media-thumbnails#0]. The service that still uses the deprecated v3 auth flow is `catalog-svc`, owned by Discovery.
+
+[31.5s]

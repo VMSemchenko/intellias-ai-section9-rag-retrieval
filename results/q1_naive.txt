@@ -1,0 +1,21 @@
+
+question: why is it 502ing?
+mode:     naive
+
+considered: 5 chunks
+
+retrieved:
+  1. [adr-0019#1] d=0.465 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       | Upstream condition | Client sees | |---|---| | Connection refused, reset, or DNS failure | `502` | | No response before the route deadline | `504` | | Upstream returned `5xx` | passed through, `upstream_status` recorde
+  2. [rb-checkout-502#0] d=0.465 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  3. [rb-gateway-timeouts#1] d=0.490 active     Runbook: gateway 5xx and timeout triage
+       - **504** — the upstream did not respond before the route deadline from ADR-0019. The   upstream is slow. Owner: the route's team. - **502 with `upstream_status` empty or `0`** — the gateway could not get a usable respon
+  4. [rb-gateway-timeouts#0] d=0.543 active     Runbook: gateway 5xx and timeout triage
+       # Runbook: gateway 5xx and timeout triage  **Page trigger:** `gateway_5xx_ratio > 0.01` over 5 minutes on any route.  This runbook decides *which team owns the incident*. It rarely ends with a gateway change.  ## Step 1:
+  5. [rb-gateway-timeouts#2] d=0.582 active     Runbook: gateway 5xx and timeout triage
+       Group by route. One route means a service problem. All routes at once means the gateway, TLS, or something shared — check certificate expiry, the shared middleware version, and the global rate limiter before assuming a s
+
+The service may 502 due to a connection that never reached a handler, indicated by an `upstream_status` field of `-` or `0` in the edge access log [rb-checkout-502#0, rb-gateway-timeouts#1]. This can happen if there are issues like connection refusal, reset, or an unparseable response [adr-0019#1]. Alternatively, it could be due to the upstream service itself returning a `502` [rb-gateway-timeouts#1].
+
+[10.6s]

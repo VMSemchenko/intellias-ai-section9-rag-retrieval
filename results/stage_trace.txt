@@ -1,0 +1,51 @@
+
+### why is it 502ing?
+filters: {}
+queries: ['why is it 502ing?', 'why are we getting bad gateway errors?', 'why is the service experiencing upstream 502 errors?']
+fused pool: 24 chunks from 3 lists
+  fused rank 19: adr-0061#0                       rrf=0.0141 d=0.557
+  fused rank 21: adr-0061#1                       rrf=0.0139 d=0.560
+rerank scores for the 16 fed to the reranker:
+   9.0  rb-checkout-502#0                
+   9.0  adr-0019#1                       
+   9.0  pm-2026-07-checkout-latency#1    
+   9.0  pm-2026-07-checkout-latency#2    
+   6.0  rb-gateway-timeouts#2            
+   6.0  pm-2026-07-checkout-latency#0    
+   3.0  rb-gateway-timeouts#1            
+   3.0  rb-gateway-timeouts#0            
+   2.0  pm-2026-02-gateway-tls#1         
+   2.0  adr-0063#1                       
+   0.0  adr-0019#0                       
+   0.0  pm-2026-02-gateway-tls#0         
+   0.0  adr-0063#0                       
+   0.0  pm-2026-04-auth-outage#0         
+   0.0  adr-0055#0                       
+   0.0  rb-gateway-timeouts#3            
+after MMR (top 5): ['rb-checkout-502#0', 'pm-2026-07-checkout-latency#2', 'adr-0019#1', 'pm-2026-07-checkout-latency#1', 'pm-2026-07-checkout-latency#0']
+
+### which services still use the deprecated v3 auth flow, and who owns them?
+filters: {'service': 'auth-svc', 'version': 'v3', 'semantic_query': 'which services still use the deprecated v3 auth flow, and who owns them'}
+queries: ['which services still use the deprecated v3 auth flow, and who owns them', 'which components still rely on the outdated v3 authentication process, and who is responsible for them', 'which systems still depend on the obsolete v3 authorization mechanism, and who manages them']
+fused pool: 23 chunks from 6 lists
+  fused rank  5: policy-deprecation#0             rrf=0.0487 d=0.448
+  fused rank 17: policy-deprecation#1             rrf=0.0152 d=0.536
+  fused rank 18: policy-service-ownership#2       rrf=0.0145 d=0.573
+rerank scores for the 16 fed to the reranker:
+   9.0  adr-0031#1                       
+   6.0  adr-0031#0                       
+   6.0  policy-deprecation#0             <== expected
+   0.0  api-auth-v3#0                    
+   0.0  api-auth-v3#1                    
+   0.0  adr-0042#2                       
+   0.0  adr-0042#0                       
+   0.0  api-auth-v4#0                    
+   0.0  adr-0042#1                       
+   0.0  rb-platform-secret-rotation#0    
+   0.0  pm-2026-07-checkout-latency#3    
+   0.0  rb-gateway-timeouts#2            
+   0.0  pm-2026-04-auth-outage#0         
+   0.0  rb-checkout-502#1                
+   0.0  policy-oncall#1                  
+   0.0  policy-data-retention#0          
+after MMR (top 5): ['adr-0031#1', 'policy-deprecation#0', 'adr-0031#0', 'rb-platform-secret-rotation#0', 'api-auth-v4#0']

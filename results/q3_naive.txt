@@ -1,0 +1,21 @@
+
+question: do we still need to call auth on every request
+mode:     naive
+
+considered: 5 chunks
+
+retrieved:
+  1. [api-auth-v3#0] d=0.467 superseded API reference: auth-svc v3 session endpoints
+       # API reference: auth-svc v3 session endpoints  **Superseded.** Use the v4 token endpoints. These endpoints return `Deprecation: true` and `Sunset: Wed, 31 Dec 2026 23:59:59 GMT` on every response.  Base path `/v3`.  ## 
+  2. [adr-0042#0] d=0.468 active     ADR-0042: Token exchange authentication (v4)
+       # ADR-0042: Token exchange authentication (v4)  **Status:** Active. Supersedes ADR-0031.  ## Context  ADR-0031 made `auth-svc` a synchronous dependency of every authenticated request and locked identity to browser cookie
+  3. [adr-0031#1] d=0.471 superseded ADR-0031: Session cookie authentication (v3)
+       The cookie is opaque, so revocation is immediate: delete the Redis key and the next introspect call fails. That was the deciding factor over signed tokens.  The cost is a network hop. Every request that needs identity ma
+  4. [adr-0042#1] d=0.477 active     ADR-0042: Token exchange authentication (v4)
+       The JWKS document is served from `GET /v4/.well-known/jwks.json` and cached in-process for 10 minutes by every consumer.  ## Consequences  Verification is local, so `auth-svc` is no longer on the critical path of every r
+  5. [adr-0031#0] d=0.502 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+
+No, with the introduction of ADR-0042, downstream services no longer need to call `auth-svc` on every request. Instead, they exchange refresh tokens for short-lived access tokens at `POST /v4/token`, and verify these tokens locally [adr-0042#1].
+
+[5.2s]

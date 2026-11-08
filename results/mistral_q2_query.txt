@@ -1,0 +1,27 @@
+
+question: which services still use the deprecated v3 auth flow, and who owns them?
+mode:     query
+
+filters:    {'version': 'v3', 'semantic_query': 'which services still use the deprecated auth flow, and who owns them?'}
+expansion:  Which services continue to utilize the outdated authentication method, and who is responsible for them?
+expansion:  What services are still relying on the obsolete authorization mechanism, and who manages their implementation?
+considered: 11 chunks
+note:       6 ranked lists, union + dedupe by best distance — rank fusion arrives in section 05
+
+retrieved:
+  1. [policy-deprecation#0] d=0.503 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+  2. [api-auth-v3#0] d=0.517 superseded API reference: auth-svc v3 session endpoints
+       # API reference: auth-svc v3 session endpoints  **Superseded.** Use the v4 token endpoints. These endpoints return `Deprecation: true` and `Sunset: Wed, 31 Dec 2026 23:59:59 GMT` on every response.  Base path `/v3`.  ## 
+  3. [policy-deprecation#1] d=0.526 active     Policy: API deprecation and the current deprecation regist
+       | Service | Owner team | Migration status | Blocker | |---|---|---|---| | catalog-svc | Discovery | not started | needs partner-facing token support | | notify-svc | Messaging | in progress | webhook signing still reads 
+  4. [adr-0031#1] d=0.539 superseded ADR-0031: Session cookie authentication (v3)
+       The cookie is opaque, so revocation is immediate: delete the Redis key and the next introspect call fails. That was the deciding factor over signed tokens.  The cost is a network hop. Every request that needs identity ma
+  5. [adr-0031#0] d=0.554 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+
+Thumbnails stop appearing when the resize queue backs up, not when uploads fail [rb-media-thumbnails#0]. The worker pool is capped at four by design, because each resize holds a full image in memory [adr-0090#2]. A single oversized upload can stall a worker for minutes while the queue keeps growing [pm-2026-08-media-backlog#1]. Check queue depth and the oldest pending job age first [rb-media-thumbnails#1].
+
+The v3 session cookie authentication is deprecated and has a target removal date of 2026-12-31 [policy-deprecation#0, api-auth-v3#0]. No new consumers are allowed and the owning team must publish a migration guide before the deprecation lands. Deprecated endpoints return a `Deprecation` and a `Sunset` header on every response.
+
+[16.4s]

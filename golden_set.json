@@ -1,0 +1,216 @@
+{
+  "notes": [
+    "Questions are phrased the way an engineer under pressure actually types them, not the",
+    "way someone who already knows the answer document would phrase them. The first draft of",
+    "this file was written the second way and naive retrieval scored 0.91 — which told us",
+    "nothing except that we had written the questions backwards.",
+    "",
+    "difficulty records the doc-level rank naive retrieval gives the expected document, so a",
+    "regression tells you which band broke. match=all marks the multi-hop cases.",
+    "",
+    "The ACL case is deliberately absent: it needs a visibility argument and is demonstrated",
+    "with `ask.py --as security-team` instead."
+  ],
+  "cases": [
+    {
+      "id": "q-502-blind",
+      "question": "checkout is throwing errors for customers and there is nothing in our logs",
+      "expected_doc_ids": ["adr-0061"],
+      "match": "any",
+      "difficulty": "hard",
+      "exercises": "vocabulary mismatch — the root-cause ADR never contains '502' or 'error'; it says pool saturation and upstream gateway timeout"
+    },
+    {
+      "id": "q-502-dashboards",
+      "question": "users cant place orders and our dashboards look fine",
+      "expected_doc_ids": ["adr-0061"],
+      "match": "any",
+      "difficulty": "hard",
+      "exercises": "symptom described from the wrong layer — three checkout documents rank above the one that explains it"
+    },
+    {
+      "id": "q-502-vague",
+      "question": "why is it 502ing?",
+      "expected_doc_ids": ["adr-0061"],
+      "match": "any",
+      "difficulty": "hard",
+      "exercises": "the query is not a search key — no service, no version, a pronoun subject"
+    },
+    {
+      "id": "q-page-catalog",
+      "question": "who do I page for catalog",
+      "expected_doc_ids": ["policy-service-ownership"],
+      "match": "any",
+      "difficulty": "hard",
+      "exercises": "every catalog-svc document outranks the platform policy that actually holds the answer"
+    },
+    {
+      "id": "q-provider-mismatch",
+      "question": "the numbers dont match what the provider says",
+      "expected_doc_ids": ["adr-0067"],
+      "match": "any",
+      "difficulty": "hard",
+      "exercises": "the postmortem about the symptom outranks the ADR that defines the process"
+    },
+    {
+      "id": "q-v3-consumers-owners",
+      "question": "which services still use the deprecated v3 auth flow, and who owns them?",
+      "expected_doc_ids": ["policy-deprecation", "policy-service-ownership"],
+      "match": "all",
+      "difficulty": "hard",
+      "exercises": "multi-hop — two independent tables, and the second lookup depends on the first"
+    },
+    {
+      "id": "q-dead-endpoint",
+      "question": "how long before we give up delivering to a dead endpoint",
+      "expected_doc_ids": ["adr-0055"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the gateway deadline ADR is a near-miss competitor for anything phrased as a timeout"
+    },
+    {
+      "id": "q-entry-update",
+      "question": "can I just update the amount on that entry",
+      "expected_doc_ids": ["adr-0044"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the honest answer is 'you cannot' — retrieval must surface the append-only rule, not the reconciliation runbook"
+    },
+    {
+      "id": "q-duplicate-event",
+      "question": "partner says we sent the same event twice",
+      "expected_doc_ids": ["adr-0038"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the postmortem about one incident outranks the ADR stating that duplicates are guaranteed"
+    },
+    {
+      "id": "q-auth-every-request",
+      "question": "do we still need to call auth on every request",
+      "expected_doc_ids": ["adr-0042"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "superseded conflict — the v3 API reference ranks first and answers 'yes', which is now wrong"
+    },
+    {
+      "id": "q-upstream-status",
+      "question": "what does an empty upstream_status mean",
+      "expected_doc_ids": ["adr-0019"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the naming-convention ADR that merely reserves the field outranks the one that defines its meaning"
+    },
+    {
+      "id": "q-search-behind",
+      "question": "how do I know if search is behind",
+      "expected_doc_ids": ["api-catalog-search"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the runtime signal is one field in an API reference, surrounded by documents about the same subject"
+    },
+    {
+      "id": "q-partner-disable",
+      "question": "can a partner turn off deliveries permanently",
+      "expected_doc_ids": ["api-notify-webhooks"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the answer is a single status code in a table; three notify documents outrank it"
+    },
+    {
+      "id": "q-skip-rotation-wait",
+      "question": "when am I allowed to skip the wait during key rotation",
+      "expected_doc_ids": ["rb-auth-token-rotation"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "the postmortem about skipping the wait outranks the runbook that says when it is permitted"
+    },
+    {
+      "id": "q-double-order",
+      "question": "why is the same order showing twice in fulfilment",
+      "expected_doc_ids": ["adr-0048", "adr-0038"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "two plausible causes in two services — idempotency keys or at-least-once delivery"
+    },
+    {
+      "id": "q-reindex-consumer",
+      "question": "should the incremental indexer be stopped while a full reindex runs",
+      "expected_doc_ids": ["rb-catalog-reindex"],
+      "match": "any",
+      "difficulty": "medium",
+      "exercises": "yes/no question whose answer is a warning inside step 4 of a runbook"
+    },
+    {
+      "id": "q-python-version",
+      "question": "what python version do we target",
+      "expected_doc_ids": ["adr-0002"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "one-shot lookup — the routing baseline; anything beyond a single search is wasted latency"
+    },
+    {
+      "id": "q-timeout-bump",
+      "question": "is it safe to bump the timeout on that route",
+      "expected_doc_ids": ["rb-gateway-timeouts", "adr-0019"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "the answer is an explicit 'do not' at the end of a runbook"
+    },
+    {
+      "id": "q-db-password",
+      "question": "i rotated the db password and now nothing can connect",
+      "expected_doc_ids": ["rb-platform-secret-rotation"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "strong lexical and semantic overlap — the case naive retrieval is good at"
+    },
+    {
+      "id": "q-all-down",
+      "question": "everything is down and its not any single service",
+      "expected_doc_ids": ["pm-2026-02-gateway-tls", "rb-gateway-timeouts"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "symptom-shaped question that maps cleanly onto one postmortem"
+    },
+    {
+      "id": "q-401-everywhere",
+      "question": "why did every service start returning 401 at once",
+      "expected_doc_ids": ["pm-2026-04-auth-outage"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "distinctive symptom, single owning document"
+    },
+    {
+      "id": "q-money-retention",
+      "question": "do we ever delete money records",
+      "expected_doc_ids": ["policy-data-retention"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "a question with a false premise — the retention table says ledger entries are never deleted"
+    },
+    {
+      "id": "q-ratelimit-redis-down",
+      "question": "what happens to rate limiting if redis is down",
+      "expected_doc_ids": ["adr-0063"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "a deliberate trade-off the assistant must report as designed, not as a bug"
+    },
+    {
+      "id": "q-broker-draft",
+      "question": "is the broker thing decided yet",
+      "expected_doc_ids": ["adr-0080"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "the answering document is a draft — the assistant must say so rather than report it as decided"
+    },
+    {
+      "id": "q-rollback",
+      "question": "how do I roll back a checkout deploy",
+      "expected_doc_ids": ["rb-checkout-rollback-v4"],
+      "match": "any",
+      "difficulty": "easy",
+      "exercises": "superseded conflict — the 2025 blue/green runbook has a near-identical title and ranks in the top 5"
+    }
+  ]
+}

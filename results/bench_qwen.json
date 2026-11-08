@@ -1,0 +1,52 @@
+{
+  "naive": {
+    "recall_at_k": 0.8,
+    "median_latency_s": 0.03,
+    "p95_latency_s": 0.05,
+    "misses": [
+      "q-502-dashboards",
+      "q-502-vague",
+      "q-page-catalog",
+      "q-provider-mismatch",
+      "q-v3-consumers-owners"
+    ]
+  },
+  "query": {
+    "recall_at_k": 0.84,
+    "median_latency_s": 1.51,
+    "p95_latency_s": 2.4,
+    "misses": [
+      "q-502-dashboards",
+      "q-502-vague",
+      "q-v3-consumers-owners",
+      "q-partner-disable"
+    ]
+  },
+  "result": {
+    "recall_at_k": 0.68,
+    "median_latency_s": 10.77,
+    "p95_latency_s": 13.45,
+    "misses": [
+      "q-502-dashboards",
+      "q-502-vague",
+      "q-page-catalog",
+      "q-provider-mismatch",
+      "q-v3-consumers-owners",
+      "q-upstream-status",
+      "q-partner-disable",
+      "q-skip-rotation-wait"
+    ]
+  },
+  "agentic": {
+    "recall_at_k": 0.8,
+    "median_latency_s": 25.21,
+    "p95_latency_s": 41.07,
+    "misses": [
+      "q-502-dashboards",
+      "q-502-vague",
+      "q-provider-mismatch",
+      "q-v3-consumers-owners",
+      "q-partner-disable"
+    ]
+  }
+}

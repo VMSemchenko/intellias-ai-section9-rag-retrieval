@@ -1,0 +1,23 @@
+
+question: do we still need to call auth on every request
+mode:     agentic
+
+attempt 1: 'do we still need to call auth on every request'
+  -> sufficient
+
+stopped: graded sufficient on attempt 1
+retrieved:
+  1. [adr-0042#0] d=0.468 rerank=9 active     ADR-0042: Token exchange authentication (v4)
+       # ADR-0042: Token exchange authentication (v4)  **Status:** Active. Supersedes ADR-0031.  ## Context  ADR-0031 made `auth-svc` a synchronous dependency of every authenticated request and locked identity to browser cookie
+  2. [adr-0042#1] d=0.477 rerank=9 active     ADR-0042: Token exchange authentication (v4)
+       # ADR-0042: Token exchange authentication (v4)  **Status:** Active. Supersedes ADR-0031.  ## Context  ADR-0031 made `auth-svc` a synchronous dependency of every authenticated request and locked identity to browser cookie
+  3. [adr-0031#1] d=0.471 rerank=6 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  4. [rb-auth-token-rotation#2] d=0.547 rerank=6 active     Runbook: rotating the auth-svc token signing keys
+       1. Generate the new EdDSA keypair in the HSM. Note the new `kid`. 2. **Publish first.** Add the public key to the JWKS document. Do not change the signing    key yet. 3. **Wait 15 minutes.** Longer than the 600-second co
+  5. [rb-auth-token-rotation#0] d=0.559 rerank=3 active     Runbook: rotating the auth-svc token signing keys
+       # Runbook: rotating the auth-svc token signing keys  Scheduled quarterly, and immediately on suspected compromise.  ## Why the order matters  Consumers cache the JWKS document for 600 seconds and verify locally. If you s
+
+No, with the introduction of ADR-0042, downstream services no longer need to call `auth-svc` on every request. Instead, they verify tokens locally using the JWKS document [adr-0042#1].
+
+[16.4s]

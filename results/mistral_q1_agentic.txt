@@ -1,0 +1,27 @@
+
+question: why is it 502ing?
+mode:     agentic
+
+attempt 1: 'why is it 502ing?'
+  -> thin — missing the root cause of the 502 errors
+attempt 2: 'cause of 502 errors in the context of edge routing, deadlines and upstream error mapping (adr-0019#1)'
+  -> thin — missing the root cause of 502 errors
+attempt 3: 'postmortem or runbook related to checkout service or edge gateway 502 errors'
+  -> thin — missing the root cause of the 502 errors
+
+stopped: hit the 3-attempt ceiling
+retrieved:
+  1. [adr-0019#0] d=0.378 rerank=9 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       # ADR-0019: Edge routing, deadlines and upstream error mapping  **Status:** Active.  ## Context  Every external request enters through one gateway. It needs a single, predictable policy for how long a request may take an
+  2. [pm-2026-07-checkout-latency#1] d=0.587 rerank=8 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       # Postmortem 2026-07-01: checkout p99 latency and 502s after the v4 auth migration  **Duration:** 47 minutes of degraded checkout, 11 minutes of hard failure. **Impact:** ~4,100 order submissions failed with a gateway er
+  3. [pm-2026-07-checkout-latency#0] d=0.581 rerank=6 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       # Postmortem 2026-07-01: checkout p99 latency and 502s after the v4 auth migration  **Duration:** 47 minutes of degraded checkout, 11 minutes of hard failure. **Impact:** ~4,100 order submissions failed with a gateway er
+  4. [adr-0019#1] d=0.465 rerank=3 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       # ADR-0019: Edge routing, deadlines and upstream error mapping  **Status:** Active.  ## Context  Every external request enters through one gateway. It needs a single, predictable policy for how long a request may take an
+  5. [rb-gateway-timeouts#1] d=0.490 rerank=2 active     Runbook: gateway 5xx and timeout triage
+       # Runbook: gateway 5xx and timeout triage  **Page trigger:** `gateway_5xx_ratio > 0.01` over 5 minutes on any route.  This runbook decides *which team owns the incident*. It rarely ends with a gateway change.  ## Step 1:
+
+Thumbnails stop appearing when the resize queue backs up, not when uploads fail [rb-media-thumbnails#0]. The worker pool is capped at four by design, because each resize holds a full image in memory [adr-0090#2]. A single oversized upload can stall a worker for minutes while the queue keeps growing [pm-2026-08-media-backlog#1]. Check queue depth and the oldest pending job age first [rb-media-thumbnails#1].
+
+[72.9s]

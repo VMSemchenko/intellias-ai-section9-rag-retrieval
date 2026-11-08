@@ -1,0 +1,30 @@
+
+question: which services still use the deprecated v3 auth flow, and who owns them?
+mode:     agentic
+
+attempt 1: 'which services still use the deprecated v3 auth flow, and who owns them?'
+  -> sufficient
+
+stopped: graded sufficient on attempt 1
+retrieved:
+  1. [adr-0031#1] d=0.509 rerank=9 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  2. [policy-deprecation#0] d=0.448 rerank=6 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+  3. [adr-0031#0] d=0.485 rerank=6 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  4. [api-auth-v4#0] d=0.571 rerank=0 active     API reference: auth-svc v4 token endpoints
+       # API reference: auth-svc v4 token endpoints  Base path `/v4`. All endpoints require TLS. Errors follow RFC 9457 problem details.  ## POST /v4/token  Exchange a refresh token for an access token.  Request:  { "refresh_to
+  5. [pm-2026-04-auth-outage#0] d=0.607 rerank=0 active     Postmortem 2026-04-14: platform-wide 401s after signing ke
+       # Postmortem 2026-04-14: platform-wide 401s after signing key rotation  **Duration:** 9 minutes. **Impact:** Every authenticated request across all services failed with `401` for the first 6 minutes, tapering as consumer
+
+The services still using the deprecated v3 auth flow and their owners are:
+
+- `catalog-svc` owned by Discovery
+- `notify-svc` owned by Messaging
+- `ledger-svc` owned by Money
+- `admin-console` owned by Internal Tools
+
+These services are listed in the current deprecation register [policy-deprecation#0].
+
+[20.3s]

@@ -1,0 +1,32 @@
+
+question: which services still use the deprecated v3 auth flow, and who owns them?
+mode:     result
+
+filters:    {'service': 'auth-svc', 'version': 'v3', 'semantic_query': 'which services still use the deprecated v3 auth flow, and who owns them'}
+expansion:  which components still rely on the outdated v3 authentication process, and who is responsible for them
+expansion:  which systems still utilize the obsolete v3 authorization method, and who manages them
+considered: 23 chunks
+note:       fetched 23 unique chunks, reranked to 10, diversified to 5, reordered for attention
+
+retrieved:
+  1. [adr-0031#1] d=0.509 rerank=9 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  2. [adr-0031#0] d=0.485 rerank=6 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  3. [api-auth-v4#0] d=0.571 rerank=0 active     API reference: auth-svc v4 token endpoints
+       # API reference: auth-svc v4 token endpoints  Base path `/v4`. All endpoints require TLS. Errors follow RFC 9457 problem details.  ## POST /v4/token  Exchange a refresh token for an access token.  Request:  { "refresh_to
+  4. [rb-platform-secret-rotation#0] d=0.550 rerank=0 active     Runbook: rotating platform secrets and database credential
+       # Runbook: rotating platform secrets and database credentials  Quarterly for all secrets, immediately on suspected exposure.  ## The general shape  Every rotation is the same three-phase pattern, and skipping the middle 
+  5. [policy-deprecation#0] d=0.448 rerank=6 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+
+Services still calling `POST /v3/session/introspect` as of the last audit and their owners are:
+
+- **catalog-svc**: Owned by Discovery
+- **notify-svc**: Owned by Messaging
+- **ledger-svc**: Owned by Money
+- **admin-console**: Owned by Internal Tools
+
+I don't have that in the docs. I would need the current status of `checkout-svc` and `gateway` to provide a complete list.
+
+[26.2s]

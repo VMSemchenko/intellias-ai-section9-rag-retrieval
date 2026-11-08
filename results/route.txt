@@ -1,0 +1,10 @@
+question: why is it 502ing?
+mode:     route
+route: full  (needs context)
+---
+mode:     route
+route: agentic  (needs dependent lookups)
+---
+mode:     route
+route: one_shot  (check API reference)
+---

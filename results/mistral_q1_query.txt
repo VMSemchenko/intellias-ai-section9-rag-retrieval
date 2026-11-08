@@ -1,0 +1,29 @@
+
+question: why is it 502ing?
+mode:     query
+
+filters:    {'semantic_query': 'why is it 502ing?'}
+expansion:  What causes the 502 Bad Gateway error?
+expansion:  Why is the 502 error occurring in our system?
+considered: 6 chunks
+note:       3 ranked lists, union + dedupe by best distance — rank fusion arrives in section 05
+
+retrieved:
+  1. [rb-checkout-502#0] d=0.424 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  2. [adr-0019#1] d=0.465 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       | Upstream condition | Client sees | |---|---| | Connection refused, reset, or DNS failure | `502` | | No response before the route deadline | `504` | | Upstream returned `5xx` | passed through, `upstream_status` recorde
+  3. [rb-gateway-timeouts#1] d=0.468 active     Runbook: gateway 5xx and timeout triage
+       - **504** — the upstream did not respond before the route deadline from ADR-0019. The   upstream is slow. Owner: the route's team. - **502 with `upstream_status` empty or `0`** — the gateway could not get a usable respon
+  4. [rb-gateway-timeouts#0] d=0.528 active     Runbook: gateway 5xx and timeout triage
+       # Runbook: gateway 5xx and timeout triage  **Page trigger:** `gateway_5xx_ratio > 0.01` over 5 minutes on any route.  This runbook decides *which team owns the incident*. It rarely ends with a gateway change.  ## Step 1:
+  5. [pm-2026-02-gateway-tls#1] d=0.529 active     Postmortem 2026-02-20: total outage from an expired TLS ce
+       - **06:00** The wildcard certificate for the public domain expires. - **06:00** Every client fails the handshake. The gateway is up and healthy; nothing gets   past TLS. All service-level dashboards look perfect — traffi
+
+The user sees a 502 Bad Gateway error on the order review page. The fault is in `checkout-svc` or below it, as the `upstream_status` in the edge access log is `-` or `0`. This is because the requests that fail never reached a handler in `checkout-svc`.
+
+To confirm this, check the edge access log for the route associated with the order review page. If the `upstream_status` field is `-` or `0`, the fault is in `checkout-svc` or below it.
+
+If you need to find out more about `checkout-svc`, you would need the service name, its version, and the type of documentation you are looking for.
+
+[13.2s]

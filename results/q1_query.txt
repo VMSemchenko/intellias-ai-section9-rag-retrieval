@@ -1,0 +1,24 @@
+
+question: why is it 502ing?
+mode:     query
+
+expansion:  why are we getting bad gateway errors?
+expansion:  why is the service returning gateway timeout?
+considered: 9 chunks
+note:       3 ranked lists, union + dedupe by best distance — rank fusion arrives in section 05
+
+retrieved:
+  1. [rb-gateway-timeouts#0] d=0.457 active     Runbook: gateway 5xx and timeout triage
+       # Runbook: gateway 5xx and timeout triage  **Page trigger:** `gateway_5xx_ratio > 0.01` over 5 minutes on any route.  This runbook decides *which team owns the incident*. It rarely ends with a gateway change.  ## Step 1:
+  2. [adr-0019#1] d=0.465 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       | Upstream condition | Client sees | |---|---| | Connection refused, reset, or DNS failure | `502` | | No response before the route deadline | `504` | | Upstream returned `5xx` | passed through, `upstream_status` recorde
+  3. [rb-checkout-502#0] d=0.465 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  4. [rb-gateway-timeouts#1] d=0.490 active     Runbook: gateway 5xx and timeout triage
+       - **504** — the upstream did not respond before the route deadline from ADR-0019. The   upstream is slow. Owner: the route's team. - **502 with `upstream_status` empty or `0`** — the gateway could not get a usable respon
+  5. [rb-checkout-502#2] d=0.494 active     Runbook: checkout returns 502 Bad Gateway
+       4. **Check the route deadline.** The edge cancels a request that exceeds the route    deadline and reports it as a gateway error. Compare the p99 of the handler against the    configured deadline for the route.  ## Mitig
+
+The 502 error indicates that the gateway did not receive a usable response from the upstream service. This can happen due to several reasons such as connection issues, unparseable responses, or the upstream service returning a 502 error itself. To diagnose the issue, check the `upstream_status` field in the edge access log. If it is `-` or `0`, the fault is likely in the service below the gateway. If it is `502`, the issue is with the upstream service, and you should investigate that service's dependencies. [adr-0019#1] [rb-checkout-502#0] [rb-gateway-timeouts#1]
+
+[10.7s]

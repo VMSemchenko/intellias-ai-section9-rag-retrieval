@@ -1,0 +1,25 @@
+
+question: do we still need to call auth on every request
+mode:     query
+
+filters:    {'service': 'auth-svc', 'doc_type': 'policy', 'semantic_query': 'do we still need to call auth on every request'}
+expansion:  is it necessary to authenticate for each API call
+expansion:  are we required to validate permissions per request
+considered: 9 chunks
+note:       6 ranked lists, union + dedupe by best distance — rank fusion arrives in section 05
+
+retrieved:
+  1. [api-auth-v3#0] d=0.467 superseded API reference: auth-svc v3 session endpoints
+       # API reference: auth-svc v3 session endpoints  **Superseded.** Use the v4 token endpoints. These endpoints return `Deprecation: true` and `Sunset: Wed, 31 Dec 2026 23:59:59 GMT` on every response.  Base path `/v3`.  ## 
+  2. [adr-0042#0] d=0.468 active     ADR-0042: Token exchange authentication (v4)
+       # ADR-0042: Token exchange authentication (v4)  **Status:** Active. Supersedes ADR-0031.  ## Context  ADR-0031 made `auth-svc` a synchronous dependency of every authenticated request and locked identity to browser cookie
+  3. [adr-0031#1] d=0.471 superseded ADR-0031: Session cookie authentication (v3)
+       The cookie is opaque, so revocation is immediate: delete the Redis key and the next introspect call fails. That was the deciding factor over signed tokens.  The cost is a network hop. Every request that needs identity ma
+  4. [adr-0042#1] d=0.477 active     ADR-0042: Token exchange authentication (v4)
+       The JWKS document is served from `GET /v4/.well-known/jwks.json` and cached in-process for 10 minutes by every consumer.  ## Consequences  Verification is local, so `auth-svc` is no longer on the critical path of every r
+  5. [api-auth-v4#0] d=0.501 active     API reference: auth-svc v4 token endpoints
+       # API reference: auth-svc v4 token endpoints  Base path `/v4`. All endpoints require TLS. Errors follow RFC 9457 problem details.  ## POST /v4/token  Exchange a refresh token for an access token.  Request:  { "refresh_to
+
+No, with the introduction of ADR-0042 and the v4 token endpoints, identity is now carried by a short-lived signed token. Downstream services verify the signature locally against the published JWKS, eliminating the need for a synchronous call to `auth-svc` on every request. Verification is done locally, reducing the load on `auth-svc` and improving overall system performance. [adr-0042#1]
+
+[6.8s]

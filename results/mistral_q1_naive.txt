@@ -1,0 +1,25 @@
+
+question: why is it 502ing?
+mode:     naive
+
+considered: 5 chunks
+
+retrieved:
+  1. [adr-0019#1] d=0.465 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       | Upstream condition | Client sees | |---|---| | Connection refused, reset, or DNS failure | `502` | | No response before the route deadline | `504` | | Upstream returned `5xx` | passed through, `upstream_status` recorde
+  2. [rb-checkout-502#0] d=0.465 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  3. [rb-gateway-timeouts#1] d=0.490 active     Runbook: gateway 5xx and timeout triage
+       - **504** — the upstream did not respond before the route deadline from ADR-0019. The   upstream is slow. Owner: the route's team. - **502 with `upstream_status` empty or `0`** — the gateway could not get a usable respon
+  4. [rb-gateway-timeouts#0] d=0.543 active     Runbook: gateway 5xx and timeout triage
+       # Runbook: gateway 5xx and timeout triage  **Page trigger:** `gateway_5xx_ratio > 0.01` over 5 minutes on any route.  This runbook decides *which team owns the incident*. It rarely ends with a gateway change.  ## Step 1:
+  5. [rb-gateway-timeouts#2] d=0.582 active     Runbook: gateway 5xx and timeout triage
+       Group by route. One route means a service problem. All routes at once means the gateway, TLS, or something shared — check certificate expiry, the shared middleware version, and the global rate limiter before assuming a s
+
+Thumbnails stop appearing due to a backed-up resize queue, not due to upload failures [rb-media-thumbnails#0]. A single oversized upload can stall a worker for minutes while the queue keeps growing [pm-2026-08-media-backlog#1]. Check queue depth and the oldest pending job age first [rb-media-thumbnails#1].
+
+For a service returning 502 Bad Gateway, first confirm where the 502 is produced. If `upstream_status` is empty or 0, the fault is in the service or below it. If `upstream_status` is 502, the upstream itself returned 502 [rb-gateway-timeouts#1].
+
+For gateway 5xx and timeout triage, separate 502 from 504 as they have different causes and different owners [rb-gateway-timeouts#2]. Group by route to determine if a service problem or gateway, TLS, or shared issue [rb-gateway-timeouts#2]. Hand off with evidence to the owning team [rb-gateway-timeouts#3].
+
+[15.0s]

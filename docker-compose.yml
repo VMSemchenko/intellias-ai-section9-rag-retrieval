@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    container_name: docs-assistant-pg
+    environment:
+      POSTGRES_DB: docs_assistant
+      POSTGRES_USER: docs
+      POSTGRES_PASSWORD: docs
+    ports:
+      - '5434:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U docs -d docs_assistant']
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

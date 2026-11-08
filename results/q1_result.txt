@@ -1,0 +1,24 @@
+
+question: why is it 502ing?
+mode:     result
+
+expansion:  why are we getting bad gateway errors?
+expansion:  why is the service returning an upstream 502?
+considered: 24 chunks
+note:       fetched 24 unique chunks, reranked to 10, diversified to 5, reordered for attention
+
+retrieved:
+  1. [rb-checkout-502#0] d=0.465 rerank=9 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  2. [adr-0019#1] d=0.465 rerank=9 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       # ADR-0019: Edge routing, deadlines and upstream error mapping  **Status:** Active.  ## Context  Every external request enters through one gateway. It needs a single, predictable policy for how long a request may take an
+  3. [pm-2026-07-checkout-latency#0] d=0.595 rerank=6 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       # Postmortem 2026-07-01: checkout p99 latency and 502s after the v4 auth migration  **Duration:** 47 minutes of degraded checkout, 11 minutes of hard failure. **Impact:** ~4,100 order submissions failed with a gateway er
+  4. [pm-2026-07-checkout-latency#1] d=0.587 rerank=9 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       # Postmortem 2026-07-01: checkout p99 latency and 502s after the v4 auth migration  **Duration:** 47 minutes of degraded checkout, 11 minutes of hard failure. **Impact:** ~4,100 order submissions failed with a gateway er
+  5. [pm-2026-07-checkout-latency#2] d=0.611 rerank=9 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       - **14:12** `checkout-svc` v4 token exchange rollout completes to 100% of pods. - **14:39** First `checkout_edge_5xx_ratio` alert. Edge 502 rate 0.6%. - **14:44** On-call joins. `checkout-svc` dashboards show normal hand
+
+The 502 error is produced because the outbound connection pool in `checkout-svc` saturated under load after the v4 auth migration. Specifically, the v4 token exchange added more outbound HTTPS requests, but `checkout-svc` was still using the default `httpx` pool size of 10 connections. This led to request queues forming when the pool was saturated, and requests failing to acquire a connection within the client timeout, resulting in a `502 Bad Gateway` error at the edge gateway [rb-checkout-502#0].
+
+[24.0s]

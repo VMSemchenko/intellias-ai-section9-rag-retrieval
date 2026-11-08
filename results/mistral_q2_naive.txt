@@ -1,0 +1,21 @@
+
+question: which services still use the deprecated v3 auth flow, and who owns them?
+mode:     naive
+
+considered: 5 chunks
+
+retrieved:
+  1. [api-auth-v3#0] d=0.432 superseded API reference: auth-svc v3 session endpoints
+       # API reference: auth-svc v3 session endpoints  **Superseded.** Use the v4 token endpoints. These endpoints return `Deprecation: true` and `Sunset: Wed, 31 Dec 2026 23:59:59 GMT` on every response.  Base path `/v3`.  ## 
+  2. [policy-deprecation#0] d=0.452 active     Policy: API deprecation and the current deprecation regist
+       # Policy: API deprecation and the current deprecation register  ## The rule  An interface is deprecated by an ADR that names its replacement. From the date that ADR is accepted:  - No new consumers. A new dependency on a
+  3. [adr-0031#0] d=0.493 superseded ADR-0031: Session cookie authentication (v3)
+       # ADR-0031: Session cookie authentication (v3)  **Status:** Superseded by ADR-0042. Retained because four services still depend on it.  ## Context  Every product surface needs to know who the caller is. In 2024 all of ou
+  4. [adr-0031#1] d=0.513 superseded ADR-0031: Session cookie authentication (v3)
+       The cookie is opaque, so revocation is immediate: delete the Redis key and the next introspect call fails. That was the deciding factor over signed tokens.  The cost is a network hop. Every request that needs identity ma
+  5. [adr-0042#2] d=0.523 active     ADR-0042: Token exchange authentication (v4)
+       The token exchange itself is a new outbound call that clients did not previously make. Services that call `auth-svc` on behalf of a user — rather than passing a token through — now make one extra outbound HTTPS request p
+
+The services still using the deprecated v3 auth flow are not specified in the provided context. To find this information, you would need to check the current deprecation register in the policy document [policy-deprecation#0]. If the services are not listed there, you would need to know the status of the last audit of services calling `POST /v3/session/introspect` as mentioned in the document [adr-0031#0].
+
+[8.0s]

@@ -1,0 +1,25 @@
+
+question: why is it 502ing?
+mode:     agentic
+
+attempt 1: 'why is it 502ing?'
+  -> thin — missing the root cause
+attempt 2: 'outbound connection pool saturation upstream timeout'
+  -> sufficient
+
+stopped: graded sufficient on attempt 2
+retrieved:
+  1. [adr-0061#2] d=0.459 rerank=9 active     ADR-0061: Outbound connection pool sizing for checkout
+       Under load the pool saturated. New requests queued waiting for a free connection, and once the queue wait exceeded the client timeout they failed with `PoolTimeout`. Because the failure happened while acquiring a connect
+  2. [adr-0019#1] d=0.465 rerank=9 active     ADR-0019: Edge routing, deadlines and upstream error mappi
+       # ADR-0019: Edge routing, deadlines and upstream error mapping  **Status:** Active.  ## Context  Every external request enters through one gateway. It needs a single, predictable policy for how long a request may take an
+  3. [rb-checkout-502#0] d=0.465 rerank=9 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  4. [rb-checkout-502#1] d=0.489 rerank=9 active     Runbook: checkout returns 502 Bad Gateway
+       # Runbook: checkout returns 502 Bad Gateway  **Page trigger:** `checkout_edge_5xx_ratio > 0.02` for 5 minutes.  ## What the user sees  The order review page fails to submit and the browser shows the generic error page. T
+  5. [pm-2026-07-checkout-latency#1] d=0.587 rerank=9 active     Postmortem 2026-07-01: checkout p99 latency and 502s after
+       # Postmortem 2026-07-01: checkout p99 latency and 502s after the v4 auth migration  **Duration:** 47 minutes of degraded checkout, 11 minutes of hard failure. **Impact:** ~4,100 order submissions failed with a gateway er
+
+The service is 502ing because the outbound connection pool for `checkout-svc` is saturated, leading to `PoolTimeout` errors. These errors are not retried, as per the decision in ADR-0061, and are reported as generic upstream gateway errors by the edge. I don't have that in the docs. To find the exact configuration and thresholds, you would need the service name (`checkout-svc`), version (`v4`), and the specific document type (likely a runbook or ADR).
+
+[40.8s]
