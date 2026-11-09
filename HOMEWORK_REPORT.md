@@ -1,7 +1,7 @@
 # Section 9 homework: four retrieval modes on two golden-set questions
 
 **Course:** Intellias NextGen Engineering Program, AI Product Engineer, *Agents, RAG Fundamentals & Advanced Retrieval*
-**Author:** Vadym Semchenko, 8 November 2026
+**Author:** Vadym Semchenko, 8 November 2026 (Q1 agentic run count updated 9 November)
 **Task:** run two `golden_set.json` questions through `naive`, `query`, `result` and `agentic`, then compare the retrieved context and the answers.
 
 ---
@@ -14,15 +14,15 @@
 | **naive** | ✗ symptom-level triage only. `adr-0061` best chunk is rank **22/120** | ✓ honest refusal: has the table's lead-in sentence, not the table |
 | **query** | ✗ same as naive, with expansions that drift to "gateway timeout" (504) | ✓ honest refusal (identical top 5 to naive) |
 | **result** | ✓ **correct root cause**, reached via the postmortem and runbook, *not* `adr-0061` | ◐ 4 services + team names, then a contradictory "I don't have that" |
-| **agentic** | ✓ **only mode that retrieves `adr-0061`** (attempt 2), but it missed in the benchmark re-run. Answer has no inline citations | ◐ 4 services + team names, cited. Grader says "sufficient" on attempt 1 |
-| Expected docs in top 5 | only agentic, 1 run in 2 | **no mode** retrieves `policy-service-ownership` |
+| **agentic** | ✓ **only mode that retrieves `adr-0061`** (attempt 2), in 3 of 4 runs; it missed in the benchmark run. Answer has no inline citations | ◐ 4 services + team names, cited. Grader says "sufficient" on attempt 1 |
+| Expected docs in top 5 | only agentic, 3 runs in 4 | **no mode** retrieves `policy-service-ownership` |
 | Full golden set, recall@5 | naive **0.80** · query **0.84** · result **0.68** · agentic **0.80** | median retrieval latency 0.03 s · 1.5 s · 10.8 s · 25.2 s |
 
 Five findings matter more than the per-mode verdicts:
 
 1. **Result mode reranks only the first 16 of ~24 fused chunks, and both questions' expected documents fall past that cut.** `adr-0061` sat at fused ranks 19 and 21 (Q1). The register table `policy-deprecation#1` and `policy-service-ownership` sat at fused ranks 17 and 18 (Q2). The reranker never saw any of them.
 2. **Parent expansion (±1 chunk) carries Q2 and most of Q1.** The register table is chunk `#1`, but only `#0` (which ends with *"Services still calling … as of the last audit:"*) ever ranks. Naive and query refuse because of this boundary; result and agentic answer because the window pulls `#1` in.
-3. **Agentic's wins come from eval leakage, and they aren't reliable.** The grader prompt's few-shot examples include this exact question and the rescue query `"outbound connection pool saturation upstream timeout"`. Attempt 2 used that string verbatim. Even so, agentic missed `q-502-vague` in the full benchmark run. Its only net gain over naive across the golden set is `q-page-catalog`, which mirrors the grader's other example ("who owns catalog?"). The self-query and router prompts also contain `"why is it 502ing?"`.
+3. **Agentic's wins come from eval leakage, and they aren't reliable.** The grader prompt's few-shot examples include this exact question and the rescue query `"outbound connection pool saturation upstream timeout"`. Attempt 2 used that string verbatim. Even so, agentic missed `q-502-vague` in the full benchmark run (1 miss in 4 runs). Its only net gain over naive across the golden set is `q-page-catalog`, which mirrors the grader's other example ("who owns catalog?"). The self-query and router prompts also contain `"why is it 502ing?"`.
 4. **Soft self-query filters are a real safeguard, and I can show it in this run.** Q3's extracted `doc_type: policy` + `service: auth-svc` matches **0 documents**, and Q2's `service: auth-svc, version: v3` matches only the two *superseded* docs. As hard SQL `WHERE` filters, both would have destroyed recall. As an extra ranked list, they cost one query each.
 5. **Model swap (bonus): `mistral:latest` copied the grounding prompt's example answer** ("Thumbnails stop appearing when the resize queue backs up…") into **6 of 8** answers, with citations to documents that don't exist. On qwen2.5 this never happened.
 
@@ -38,7 +38,7 @@ Five findings matter more than the per-mode verdicts:
 | Chat / rerank / grader model | `qwen2.5:7b-instruct` (main runs), `mistral:latest` (bonus comparison) |
 | Command | `scripts/ask.py --mode <mode> "<question>" --show-context`, one run per cell, models warmed up first |
 
-Raw outputs for every run are in [`results/`](results/). `results/stage_trace.txt` is an instrumented re-run of the result-mode stages: fused rank → rerank score → MMR. Each cell is a single run. Expansions (temperature 0.4) and rerank scores vary between runs, so treat individual numbers as one sample. The structural findings (chunk boundaries, rerank cut, prompt contents) are deterministic.
+Raw outputs for every run are in [`results/`](results/). `results/stage_trace.txt` is an instrumented re-run of the result-mode stages: fused rank → rerank score → MMR. Each cell is a single run, except that Q1 agentic was repeated (see the benchmark section and `results/q1_agentic_rerun.txt`). Expansions (temperature 0.4) and rerank scores vary between runs, so treat individual numbers as one sample. The structural findings (chunk boundaries, rerank cut, prompt contents) are deterministic.
 
 ## What each mode does (from the code)
 
@@ -168,8 +168,8 @@ With 25 questions, one question is worth 0.04, and the README reports about ±0.
 What this adds to the two deep dives:
 
 - **More stages didn't mean more recall.** Result mode missed every question naive missed, plus three naive answers (`q-upstream-status`, `q-skip-rotation-wait`, `q-partner-disable`). That's three questions, outside the noise band. Result mode loses documents at two cuts. The README's own stage table shows the fused top 16 still holds recall **0.92**, so most of the loss happens when rerank + MMR cut that pool to 5. My stage trace shows a second, earlier cut: the featured questions' documents sit past fused rank 16, so the reranker never sees them at all.
-- **Agentic's Q1 success isn't reproducible.** In this run, agentic *missed* `q-502-vague` (13.2 s, so it most likely stopped after one attempt), even with its rescue query sitting in the prompt. That's 1 hit in 2 runs.
-- **Agentic's one net gain over naive is the other few-shot question.** It found `q-page-catalog` ("who do I page for catalog") at rank 1, after 41 s. The grader prompt's second example is `"who owns catalog?" → next_query "service ownership table escalation contacts"`. So both golden questions that agentic should win on have their answer paths in its prompt, and it reliably won only one of them.
+- **Agentic's Q1 success isn't guaranteed.** In this run, agentic *missed* `q-502-vague` (13.2 s, so it most likely stopped after one attempt), even with its rescue query sitting in the prompt. I ran Q1 agentic twice more on 9 November: once from a fresh clone of this repo (console output only, not saved) and once saved as [`results/q1_agentic_rerun.txt`](results/q1_agentic_rerun.txt). Both found `adr-0061#2` at rank 1 on attempt 2, using the same few-shot string. That's 3 hits in 4 runs. The rerun took 74.7 s because I didn't warm the models up first, unlike the main runs. Its answer had the same two flaws as the first run: no inline citations, and the refusal phrase stuck onto a correct answer.
+- **Agentic's one net gain over naive is the other few-shot question.** It found `q-page-catalog` ("who do I page for catalog") at rank 1, after 41 s. The grader prompt's second example is `"who owns catalog?" → next_query "service ownership table escalation contacts"`. So both golden questions that agentic should win on have their answer paths in its prompt, and in the benchmark run it won only one of them.
 - **Query mode was the best recall-per-second** in this run (0.84 at 1.5 s). The vocabulary-mismatch family (`q-502-*`) beat every mode.
 
 ---
@@ -207,7 +207,7 @@ The lesson matches what the README says about reasoning models: every stage of t
 - *Citations get coarser after expansion:* `[rb-checkout-502#0]` really cites the window #0–#1, so an ordinal no longer points at the sentence that supports the claim.
 - *Cost:* 19 LLM calls and ~24 s end-to-end versus 1 call / ~5 s for naive.
 
-**agentic.** grade → name the gap → re-query is the right shape, and on Q1 it was the only mode to retrieve the answer document. Three caveats from these runs. First, both golden questions where it beats naive (`q-502-vague`, `q-page-catalog`) have their answer paths in the grader's few-shot examples, so its score overstates the method. Second, even with that help, it found `adr-0061` in only 1 of 2 runs. Third, the grader is lenient by design ("even a partial one… does not have to be complete") and accepted Q2 after one hop. It costs 1–3× the result pipeline (20–39 LLM calls, 20–41 s here; mistral hit 73–75 s). It should sit behind `route` mode rather than run on every question. In this run, `route` sent Q1 → `full`, Q2 → `agentic` and Q3 → `one_shot`. That split is sensible, and naive alone did answer Q3 correctly. But Q1 and Q2 are also the router's few-shot examples, so this doesn't show how it routes unseen questions ([`results/route.txt`](results/route.txt)).
+**agentic.** grade → name the gap → re-query is the right shape, and on Q1 it was the only mode to retrieve the answer document. Three caveats from these runs. First, both golden questions where it beats naive (`q-502-vague`, `q-page-catalog`) have their answer paths in the grader's few-shot examples, so its score overstates the method. Second, even with that help, it missed `adr-0061` in 1 of 4 runs. Third, the grader is lenient by design ("even a partial one… does not have to be complete") and accepted Q2 after one hop. It costs 1–3× the result pipeline (20–39 LLM calls, 20–41 s here; mistral hit 73–75 s). It should sit behind `route` mode rather than run on every question. In this run, `route` sent Q1 → `full`, Q2 → `agentic` and Q3 → `one_shot`. That split is sensible, and naive alone did answer Q3 correctly. But Q1 and Q2 are also the router's few-shot examples, so this doesn't show how it routes unseen questions ([`results/route.txt`](results/route.txt)).
 
 **generation (all modes).** qwen2.5 followed the contract well (cited, preferred `active` over `superseded`; Q3 below shows all four modes resolving the v3/v4 conflict correctly). It had two recurring failures: the exact refusal phrase gets stuck onto a correct answer (Q1 agentic, Q2 result), and sometimes the inline citations are dropped entirely (Q1 agentic).
 
